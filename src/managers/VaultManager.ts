@@ -98,14 +98,16 @@ export class VaultManager {
   validateVault(vault: VaultData): boolean {
     let hasTrap = false;
     let hasPlatform = false;
+    let hasExit = false;
     for (let r = 0; r < GRID_ROWS; r++) {
       for (let c = 0; c < GRID_COLS; c++) {
         const cell = vault.grid[r][c];
         if (cell.trapType) hasTrap = true;
         if (cell.cellType === CellType.PLATFORM) hasPlatform = true;
+        if (cell.hasExit) hasExit = true;
       }
     }
-    return hasTrap && hasPlatform;
+    return hasTrap && hasPlatform && hasExit;
   }
 
   calculateDifficulty(vault: VaultData): number {
@@ -121,6 +123,7 @@ export class VaultManager {
             case TrapType.FAKE_FLOOR: score += 2; break;
             case TrapType.TURRET: score += 3; break;
             case TrapType.SAW_BLADE: score += 4; break;
+            case TrapType.BOMB: score += 5; break;
           }
         }
       }
@@ -157,9 +160,9 @@ export class VaultManager {
     // Sample vault 2: The Gauntlet
     const grid2 = createEmptyGrid();
     // Create multi-level platform layout
-    for (let c = 1; c < 9; c++) grid2[6][c] = { cellType: CellType.PLATFORM, trapType: null };
-    for (let c = 2; c < 8; c++) grid2[4][c] = { cellType: CellType.PLATFORM, trapType: null };
-    for (let c = 3; c < 9; c++) grid2[2][c] = { cellType: CellType.PLATFORM, trapType: null };
+    for (let c = 1; c < 9; c++) grid2[6][c] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
+    for (let c = 2; c < 8; c++) grid2[4][c] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
+    for (let c = 3; c < 9; c++) grid2[2][c] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
     // Traps
     grid2[7][2].trapType = TrapType.SPIKES;
     grid2[7][5].trapType = TrapType.SPIKES;
@@ -182,11 +185,11 @@ export class VaultManager {
 
     // Sample vault 3: Deception
     const grid3 = createEmptyGrid();
-    for (let c = 0; c < 10; c++) grid3[5][c] = { cellType: CellType.PLATFORM, trapType: null };
+    for (let c = 0; c < 10; c++) grid3[5][c] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
     grid3[5][3] = { cellType: CellType.PLATFORM, trapType: TrapType.FAKE_FLOOR };
     grid3[5][6] = { cellType: CellType.PLATFORM, trapType: TrapType.FAKE_FLOOR };
-    grid3[3][4] = { cellType: CellType.PLATFORM, trapType: null };
-    grid3[3][5] = { cellType: CellType.PLATFORM, trapType: null };
+    grid3[3][4] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
+    grid3[3][5] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
     grid3[7][2].trapType = TrapType.SPIKES;
     grid3[7][3].trapType = TrapType.SPIKES;
     grid3[7][5].trapType = TrapType.SPIKES;

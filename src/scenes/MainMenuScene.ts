@@ -19,6 +19,9 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Fade in
+    this.cameras.main.fadeIn(400, 26, 10, 46);
+
     const audio = AudioManager.getInstance();
     try { audio.playMenuMusic(); } catch (_) {}
 
@@ -138,39 +141,42 @@ export class MainMenuScene extends Phaser.Scene {
       },
     });
 
-    // ---- Bottom buttons ----
-    const saveData = SaveManager.getInstance().getData();
-
-    const soundBtn = new Button(this, {
-      x: GAME_WIDTH / 2 - 75, y: btnY + btnGap * 4 + 20,
-      width: 130, height: 42,
-      text: saveData.soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF',
-      fontSize: 14,
-      bgColor: saveData.soundEnabled ? 0x27ae60 : 0x555555,
+    new Button(this, {
+      x: GAME_WIDTH / 2, y: btnY + btnGap * 4,
+      width: 280, height: 52,
+      text: '📖  HOW TO PLAY',
+      fontSize: 20,
+      bgColor: 0x8e44ad,
+      hoverColor: 0x9b59b6,
       onClick: () => {
-        const d = SaveManager.getInstance().getData();
-        const newState = !d.soundEnabled;
-        SaveManager.getInstance().updateData({ soundEnabled: newState });
-        audio.setSoundEnabled(newState);
-        soundBtn.setText(newState ? '🔊 Sound ON' : '🔇 Sound OFF');
-        soundBtn.setBgColor(newState ? 0x27ae60 : 0x555555);
+        audio.stopMusic();
+        this.scene.start('HowToPlayScene');
       },
     });
 
-    const musicBtn = new Button(this, {
-      x: GAME_WIDTH / 2 + 75, y: btnY + btnGap * 4 + 20,
-      width: 130, height: 42,
-      text: saveData.musicEnabled ? '🎵 Music ON' : '🔇 Music OFF',
-      fontSize: 14,
-      bgColor: saveData.musicEnabled ? 0x27ae60 : 0x555555,
+    new Button(this, {
+      x: GAME_WIDTH / 2, y: btnY + btnGap * 5,
+      width: 280, height: 52,
+      text: '🏆  LEADERBOARD',
+      fontSize: 20,
+      bgColor: 0xc0392b,
+      hoverColor: 0xe74c3c,
       onClick: () => {
-        const d = SaveManager.getInstance().getData();
-        const newState = !d.musicEnabled;
-        SaveManager.getInstance().updateData({ musicEnabled: newState });
-        audio.setMusicEnabled(newState);
-        if (newState) try { audio.playMenuMusic(); } catch (_) {}
-        musicBtn.setText(newState ? '🎵 Music ON' : '🔇 Music OFF');
-        musicBtn.setBgColor(newState ? 0x27ae60 : 0x555555);
+        audio.stopMusic();
+        this.scene.start('LeaderboardScene');
+      },
+    });
+
+    // ---- Bottom buttons ----
+    new Button(this, {
+      x: GAME_WIDTH / 2, y: btnY + btnGap * 6 + 20,
+      width: 200, height: 42,
+      text: '⚙️  SETTINGS',
+      fontSize: 16,
+      bgColor: 0x555555,
+      onClick: () => {
+        audio.stopMusic();
+        this.scene.start('SettingsScene');
       },
     });
 
@@ -178,7 +184,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.hud = new HUD(this);
 
     // ---- Version ----
-    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 20, 'v1.0.0 — Phantom Heist', {
+    this.add.text(GAME_WIDTH / 2, GAME_HEIGHT - 20, 'v1.2.0 — Phantom Heist', {
       fontSize: '10px', fontFamily: 'Arial', color: '#555555',
     }).setOrigin(0.5);
   }

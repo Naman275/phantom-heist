@@ -26,6 +26,9 @@ export interface PlayerSaveData {
   tutorialCompleted: boolean;
   soundEnabled: boolean;
   musicEnabled: boolean;
+  completedRaidVaults: string[];
+  unlockedAchievements: string[];
+  publishedVaults: number;
   createdAt: number;
 }
 
@@ -77,6 +80,9 @@ export class SaveManager {
       tutorialCompleted: false,
       soundEnabled: true,
       musicEnabled: true,
+      completedRaidVaults: [],
+      unlockedAchievements: [],
+      publishedVaults: 0,
       createdAt: Date.now(),
     };
   }

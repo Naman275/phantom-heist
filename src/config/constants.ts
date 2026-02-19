@@ -7,13 +7,13 @@ export const GAME_WIDTH = 480;
 export const GAME_HEIGHT = 854;
 
 // ---- Vault Grid ----
-export const GRID_COLS = 10;
-export const GRID_ROWS = 8;
+export const GRID_COLS = 30;
+export const GRID_ROWS = 14;
 export const CELL_SIZE = 48;
 export const GRID_OFFSET_X = 0;
 export const GRID_OFFSET_Y = 60;
-export const GRID_WIDTH = GRID_COLS * CELL_SIZE;  // 480
-export const GRID_HEIGHT = GRID_ROWS * CELL_SIZE; // 384
+export const GRID_WIDTH = GRID_COLS * CELL_SIZE;  // 1440
+export const GRID_HEIGHT = GRID_ROWS * CELL_SIZE; // 672
 
 // ---- Colors ----
 export const COLORS = {
@@ -45,6 +45,7 @@ export enum TrapType {
   FAKE_FLOOR = 'fake_floor',
   TURRET = 'turret',
   SAW_BLADE = 'saw_blade',
+  BOMB = 'bomb',
 }
 
 export interface TrapInfo {
@@ -112,6 +113,15 @@ export const TRAP_DATA: Record<TrapType, TrapInfo> = {
     damage: 2,
     symbol: '⚙',
   },
+  [TrapType.BOMB]: {
+    name: 'Time Bomb',
+    description: 'Activates on touch, explodes after 3s with blast radius',
+    coinCost: 400,
+    color: 0xff2222,
+    unlockLevel: 8,
+    damage: 3,
+    symbol: '💣',
+  },
 };
 
 // ---- Cell Types ----
@@ -124,6 +134,9 @@ export enum CellType {
 export interface VaultCell {
   cellType: CellType;
   trapType: TrapType | null;
+  hasCoin: boolean;
+  hasExit: boolean;
+  hasEntrance: boolean;
 }
 
 export interface VaultData {
@@ -145,14 +158,20 @@ export interface VaultData {
 
 // ---- Player Physics ----
 export const PLAYER = {
-  SPEED: 180,
-  JUMP_VELOCITY: -380,
-  GRAVITY: 900,
+  SPEED: 200,
+  ACCELERATION: 1200,
+  DECELERATION: 800,
+  JUMP_VELOCITY: -420,
+  JUMP_HOLD_BOOST: -50,
+  GRAVITY: 950,
   MAX_HP: 3,
-  WIDTH: 28,
-  HEIGHT: 36,
+  WIDTH: 32,
+  HEIGHT: 44,
   COLOR: 0x00d4ff,
   INVINCIBLE_MS: 1500,
+  RAID_TIME_LIMIT: 60, // seconds
+  COYOTE_TIME_MS: 120, // ms after leaving ground where jump still works
+  JUMP_BUFFER_MS: 100, // ms before landing where jump input is buffered
 };
 
 // ---- Gadget Types ----
@@ -292,6 +311,9 @@ export function createEmptyGrid(): VaultCell[][] {
       grid[row][col] = {
         cellType: row === GRID_ROWS - 1 ? CellType.PLATFORM : CellType.EMPTY,
         trapType: null,
+        hasCoin: false,
+        hasExit: false,
+        hasEntrance: false,
       };
     }
   }
@@ -301,13 +323,13 @@ export function createEmptyGrid(): VaultCell[][] {
 export function createTutorialVault(): VaultData {
   const grid = createEmptyGrid();
   // Add some platforms to create a path
-  grid[5][2] = { cellType: CellType.PLATFORM, trapType: null };
-  grid[5][3] = { cellType: CellType.PLATFORM, trapType: null };
-  grid[5][4] = { cellType: CellType.PLATFORM, trapType: null };
-  grid[3][5] = { cellType: CellType.PLATFORM, trapType: null };
-  grid[3][6] = { cellType: CellType.PLATFORM, trapType: null };
-  grid[3][7] = { cellType: CellType.PLATFORM, trapType: null };
-  grid[5][8] = { cellType: CellType.PLATFORM, trapType: null };
+  grid[5][2] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
+  grid[5][3] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
+  grid[5][4] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
+  grid[3][5] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
+  grid[3][6] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
+  grid[3][7] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
+  grid[5][8] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
   // Add spikes
   grid[7][3].trapType = TrapType.SPIKES;
   grid[7][6].trapType = TrapType.SPIKES;

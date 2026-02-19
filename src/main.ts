@@ -12,6 +12,9 @@ import { ShopScene } from './scenes/ShopScene';
 import { ProfileScene } from './scenes/ProfileScene';
 import { DailyRewardScene } from './scenes/DailyRewardScene';
 import { VaultSelectScene } from './scenes/VaultSelectScene';
+import { HowToPlayScene } from './scenes/HowToPlayScene';
+import { LeaderboardScene } from './scenes/LeaderboardScene';
+import { SettingsScene } from './scenes/SettingsScene';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -22,6 +25,14 @@ const config: Phaser.Types.Core.GameConfig = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+    min: {
+      width: 320,
+      height: 480,
+    },
+    max: {
+      width: 720,
+      height: 1280,
+    },
   },
   physics: {
     default: 'arcade',
@@ -40,6 +51,9 @@ const config: Phaser.Types.Core.GameConfig = {
     ShopScene,
     ProfileScene,
     DailyRewardScene,
+    HowToPlayScene,
+    LeaderboardScene,
+    SettingsScene,
   ],
   input: {
     activePointers: 3,

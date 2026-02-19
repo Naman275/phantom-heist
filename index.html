@@ -18,6 +18,11 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       -webkit-user-select: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
     }
     #game-container {
       width: 100%;
@@ -25,10 +30,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     }
     canvas {
       display: block;
-      image-rendering: pixelated;
+      image-rendering: auto;
+      -webkit-image-rendering: auto;
     }
   </style>
 </head>

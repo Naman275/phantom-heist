@@ -51,19 +51,32 @@ export class VaultService {
     if (!db) return [];
 
     try {
-      const q = query(
-        collection(db, COLLECTION_VAULTS),
-        where('published', '==', true),
-        orderBy('publishedAt', 'desc'),
-        limit(count),
-      );
+      // Try with composite index first, fall back to simpler query
+      let snapshot;
+      try {
+        const q = query(
+          collection(db, COLLECTION_VAULTS),
+          where('published', '==', true),
+          orderBy('publishedAt', 'desc'),
+          limit(count),
+        );
+        snapshot = await getDocs(q);
+      } catch (indexErr) {
+        console.log('Composite index not ready, trying simple query:', indexErr);
+        // Fallback: just get all vaults without ordering
+        const q = query(
+          collection(db, COLLECTION_VAULTS),
+          where('published', '==', true),
+          limit(count),
+        );
+        snapshot = await getDocs(q);
+      }
 
-      const snapshot = await getDocs(q);
-      return snapshot.docs.map(doc => {
-        const data = doc.data();
+      return snapshot.docs.map(d => {
+        const data = d.data();
         return {
           ...data,
-          grid: JSON.parse(data.grid),
+          grid: typeof data.grid === 'string' ? JSON.parse(data.grid) : data.grid,
         } as VaultData;
       });
     } catch (error) {

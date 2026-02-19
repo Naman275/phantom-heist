@@ -16,28 +16,181 @@ export class GraphicsGenerator {
   }
 
   static generatePlayer(scene: Phaser.Scene): void {
-    const g = scene.make.graphics({ x: 0, y: 0 }, false);
     const w = PLAYER.WIDTH;
     const h = PLAYER.HEIGHT;
 
-    // Body
-    g.fillStyle(COLORS.ACCENT_CYAN, 1);
-    g.fillRoundedRect(0, 4, w, h - 4, 6);
+    // Stickman proportions
+    const headR = 6;
+    const cx = w / 2;       // center x
+    const headY = headR + 1;
+    const neckY = headY + headR;
+    const shoulderY = neckY + 2;
+    const hipY = h - 16;
+    const upperArm = 8;
+    const lowerArm = 7;
+    const upperLeg = 9;
+    const lowerLeg = 8;
 
-    // Mask/Visor
-    g.fillStyle(0x1a1a2e, 1);
-    g.fillRoundedRect(4, 8, w - 8, 12, 4);
+    const bodyCol = 0x00d4ff;
+    const skinCol = 0x00bbdd;
+    const shoeCol = 0xffaa00;
 
-    // Eyes
-    g.fillStyle(0x00ffff, 1);
-    g.fillCircle(10, 14, 3);
-    g.fillCircle(w - 10, 14, 3);
+    // Draws a 2-segment jointed limb (upper + lower)
+    const drawLimb = (g: Phaser.GameObjects.Graphics,
+      startX: number, startY: number,
+      angle1: number, len1: number,
+      angle2: number, len2: number,
+      thickness: number, color: number,
+      drawFoot = false) => {
+      const midX = startX + Math.cos(angle1) * len1;
+      const midY = startY + Math.sin(angle1) * len1;
+      const endX = midX + Math.cos(angle2) * len2;
+      const endY = midY + Math.sin(angle2) * len2;
 
-    // Belt
-    g.fillStyle(COLORS.ACCENT_GOLD, 1);
-    g.fillRect(2, h - 14, w - 4, 4);
+      g.lineStyle(thickness, color, 1);
+      g.lineBetween(startX, startY, midX, midY);
+      g.lineStyle(thickness, color, 0.9);
+      g.lineBetween(midX, midY, endX, endY);
 
+      // Joint circle
+      g.fillStyle(color, 0.6);
+      g.fillCircle(midX, midY, 1.5);
+
+      // Foot/hand
+      if (drawFoot) {
+        g.fillStyle(shoeCol, 1);
+        g.fillCircle(endX, endY, 2.5);
+      } else {
+        g.fillStyle(skinCol, 1);
+        g.fillCircle(endX, endY, 1.5);
+      }
+    };
+
+    const drawHead = (g: Phaser.GameObjects.Graphics, ox: number = 0) => {
+      // Head circle
+      g.fillStyle(bodyCol, 1);
+      g.fillCircle(cx + ox, headY, headR);
+      // Mask/visor band
+      g.fillStyle(0x1a1a2e, 1);
+      g.fillRoundedRect(cx + ox - headR + 1, headY - 2, (headR - 1) * 2, 5, 2);
+      // Eyes (glowing)
+      g.fillStyle(0x00ffff, 1);
+      g.fillCircle(cx + ox - 2.5, headY - 0.5, 1.5);
+      g.fillCircle(cx + ox + 2.5, headY - 0.5, 1.5);
+    };
+
+    const drawBody = (g: Phaser.GameObjects.Graphics, tilt: number = 0) => {
+      g.lineStyle(3, bodyCol, 1);
+      g.lineBetween(cx + tilt * 0.8, neckY, cx + tilt * 0.2, hipY);
+      // Belt
+      g.fillStyle(COLORS.ACCENT_GOLD, 1);
+      g.fillRect(cx + tilt * 0.2 - 4, hipY - 2, 8, 3);
+    };
+
+    // === IDLE ===
+    let g = scene.make.graphics({ x: 0, y: 0 }, false);
+    drawHead(g);
+    drawBody(g);
+    // Arms hanging
+    drawLimb(g, cx, shoulderY, Math.PI * 0.55, upperArm, Math.PI * 0.65, lowerArm, 2, skinCol);
+    drawLimb(g, cx, shoulderY, Math.PI * 0.45, upperArm, Math.PI * 0.35, lowerArm, 2, skinCol);
+    // Legs standing
+    drawLimb(g, cx, hipY, Math.PI * 0.42, upperLeg, Math.PI * 0.48, lowerLeg, 2.5, skinCol, true);
+    drawLimb(g, cx, hipY, Math.PI * 0.58, upperLeg, Math.PI * 0.52, lowerLeg, 2.5, skinCol, true);
     g.generateTexture('player', w, h);
+    g.destroy();
+
+    // === RUN FRAME 1 (right leg forward, left arm forward) ===
+    g = scene.make.graphics({ x: 0, y: 0 }, false);
+    drawHead(g, 2);
+    drawBody(g, 2);
+    drawLimb(g, cx + 1, shoulderY, Math.PI * 0.15, upperArm, Math.PI * 0.6, lowerArm, 2, skinCol);  // left arm back
+    drawLimb(g, cx + 1, shoulderY, Math.PI * 0.85, upperArm, Math.PI * 0.4, lowerArm, 2, skinCol);  // right arm forward
+    drawLimb(g, cx + 1, hipY, Math.PI * 0.3, upperLeg, Math.PI * 0.55, lowerLeg, 2.5, skinCol, true);   // right leg forward
+    drawLimb(g, cx + 1, hipY, Math.PI * 0.7, upperLeg, Math.PI * 0.35, lowerLeg, 2.5, skinCol, true);  // left leg back
+    g.generateTexture('player_run1', w, h);
+    g.destroy();
+
+    // === RUN FRAME 2 (passing - legs together) ===
+    g = scene.make.graphics({ x: 0, y: 0 }, false);
+    drawHead(g, 2);
+    drawBody(g, 2);
+    drawLimb(g, cx + 1, shoulderY, Math.PI * 0.45, upperArm, Math.PI * 0.55, lowerArm, 2, skinCol);
+    drawLimb(g, cx + 1, shoulderY, Math.PI * 0.55, upperArm, Math.PI * 0.45, lowerArm, 2, skinCol);
+    drawLimb(g, cx + 1, hipY, Math.PI * 0.47, upperLeg, Math.PI * 0.5, lowerLeg, 2.5, skinCol, true);
+    drawLimb(g, cx + 1, hipY, Math.PI * 0.53, upperLeg, Math.PI * 0.5, lowerLeg, 2.5, skinCol, true);
+    g.generateTexture('player_run2', w, h);
+    g.destroy();
+
+    // === RUN FRAME 3 (left leg forward, right arm forward - opposite of frame 1) ===
+    g = scene.make.graphics({ x: 0, y: 0 }, false);
+    drawHead(g, 2);
+    drawBody(g, 2);
+    drawLimb(g, cx + 1, shoulderY, Math.PI * 0.85, upperArm, Math.PI * 0.4, lowerArm, 2, skinCol);   // left arm forward
+    drawLimb(g, cx + 1, shoulderY, Math.PI * 0.15, upperArm, Math.PI * 0.6, lowerArm, 2, skinCol);   // right arm back
+    drawLimb(g, cx + 1, hipY, Math.PI * 0.7, upperLeg, Math.PI * 0.35, lowerLeg, 2.5, skinCol, true);  // left leg forward
+    drawLimb(g, cx + 1, hipY, Math.PI * 0.3, upperLeg, Math.PI * 0.55, lowerLeg, 2.5, skinCol, true);  // right leg back
+    g.generateTexture('player_run3', w, h);
+    g.destroy();
+
+    // === RUN FRAME 4 (passing again - legs together, other phase) ===
+    g = scene.make.graphics({ x: 0, y: 0 }, false);
+    drawHead(g, 2);
+    drawBody(g, 2);
+    drawLimb(g, cx + 1, shoulderY, Math.PI * 0.5, upperArm, Math.PI * 0.5, lowerArm, 2, skinCol);
+    drawLimb(g, cx + 1, shoulderY, Math.PI * 0.5, upperArm, Math.PI * 0.5, lowerArm, 2, skinCol);
+    drawLimb(g, cx + 1, hipY, Math.PI * 0.5, upperLeg, Math.PI * 0.48, lowerLeg, 2.5, skinCol, true);
+    drawLimb(g, cx + 1, hipY, Math.PI * 0.5, upperLeg, Math.PI * 0.52, lowerLeg, 2.5, skinCol, true);
+    g.generateTexture('player_run4', w, h);
+    g.destroy();
+
+    // === JUMP (tucked up, arms raised, knees bent) ===
+    g = scene.make.graphics({ x: 0, y: 0 }, false);
+    drawHead(g);
+    drawBody(g);
+    // Arms up and out
+    drawLimb(g, cx, shoulderY, -Math.PI * 0.25, upperArm, -Math.PI * 0.6, lowerArm, 2, skinCol);
+    drawLimb(g, cx, shoulderY, Math.PI + Math.PI * 0.25, upperArm, -Math.PI * 0.4, lowerArm, 2, skinCol);
+    // Legs bent/tucked
+    drawLimb(g, cx - 2, hipY, Math.PI * 0.35, upperLeg, Math.PI * 0.8, lowerLeg, 2.5, skinCol, true);
+    drawLimb(g, cx + 2, hipY, Math.PI * 0.65, upperLeg, Math.PI * 0.2, lowerLeg, 2.5, skinCol, true);
+    g.generateTexture('player_jump', w, h);
+    g.destroy();
+
+    // === FALL (spread eagle, arms/legs wide) ===
+    g = scene.make.graphics({ x: 0, y: 0 }, false);
+    drawHead(g);
+    drawBody(g);
+    // Arms wide up
+    drawLimb(g, cx, shoulderY, -Math.PI * 0.4, upperArm, -Math.PI * 0.1, lowerArm, 2, skinCol);
+    drawLimb(g, cx, shoulderY, Math.PI + Math.PI * 0.4, upperArm, Math.PI + Math.PI * 0.1, lowerArm, 2, skinCol);
+    // Legs dangling wide
+    drawLimb(g, cx, hipY, Math.PI * 0.35, upperLeg, Math.PI * 0.55, lowerLeg, 2.5, skinCol, true);
+    drawLimb(g, cx, hipY, Math.PI * 0.65, upperLeg, Math.PI * 0.45, lowerLeg, 2.5, skinCol, true);
+    g.generateTexture('player_fall', w, h);
+    g.destroy();
+
+    // === DEATH (flat on ground, X eyes) ===
+    g = scene.make.graphics({ x: 0, y: 0 }, false);
+    // Head on left
+    g.fillStyle(bodyCol, 0.5);
+    g.fillCircle(8, h - 7, headR);
+    g.lineStyle(2, 0xff0000, 1);
+    g.lineBetween(5, h - 10, 11, h - 4);
+    g.lineBetween(11, h - 10, 5, h - 4);
+    // Body horizontal
+    g.lineStyle(3, bodyCol, 0.4);
+    g.lineBetween(14, h - 7, w - 6, h - 7);
+    // Limbs splayed
+    g.lineStyle(2, skinCol, 0.3);
+    g.lineBetween(16, h - 7, 10, h - 17);
+    g.lineBetween(20, h - 7, 26, h - 15);
+    g.lineBetween(w - 10, h - 7, w - 6, h - 15);
+    g.lineBetween(w - 8, h - 7, w - 2, h - 2);
+    g.fillStyle(shoeCol, 0.4);
+    g.fillCircle(10, h - 17, 2);
+    g.fillCircle(w - 2, h - 2, 2);
+    g.generateTexture('player_death', w, h);
     g.destroy();
   }
 

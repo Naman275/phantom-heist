@@ -5,6 +5,8 @@ import Phaser from 'phaser';
 import { SCENES, GAME_WIDTH, GAME_HEIGHT, COLORS } from '../config/constants';
 import { GraphicsGenerator } from '../objects/GraphicsGenerator';
 import { SaveManager } from '../managers/SaveManager';
+import { initFirebase } from '../firebase/firebaseConfig';
+import { AuthService } from '../firebase/authService';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -65,6 +67,14 @@ export class BootScene extends Phaser.Scene {
 
     // Initialize save system
     SaveManager.getInstance();
+
+    // Initialize Firebase & sign in anonymously
+    try {
+      initFirebase();
+      AuthService.getInstance().signInAnon().catch(e => console.log('Auth skip:', e));
+    } catch (e) {
+      console.log('Firebase init skipped:', e);
+    }
 
     // === TEST: Add 29834 coins ===
     const data = SaveManager.getInstance().getData();
