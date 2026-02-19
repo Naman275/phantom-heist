@@ -323,13 +323,13 @@ export function createEmptyGrid(): VaultCell[][] {
 export function createTutorialVault(): VaultData {
   const grid = createEmptyGrid();
   // Add some platforms to create a path
-  grid[5][2] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
-  grid[5][3] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
-  grid[5][4] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
-  grid[3][5] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
-  grid[3][6] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
-  grid[3][7] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
-  grid[5][8] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false };
+  grid[5][2] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
+  grid[5][3] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
+  grid[5][4] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
+  grid[3][5] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
+  grid[3][6] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
+  grid[3][7] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
+  grid[5][8] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
   // Add spikes
   grid[7][3].trapType = TrapType.SPIKES;
   grid[7][6].trapType = TrapType.SPIKES;

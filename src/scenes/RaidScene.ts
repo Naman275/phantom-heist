@@ -689,10 +689,10 @@ export class RaidScene extends Phaser.Scene {
     const mmW = 100; const mmH = 40;
     const mmX = GAME_WIDTH - mmW - 10; const mmY = 52;
     const scaleX = mmW / (GRID_COLS * CELL_SIZE);
-    const scaleY = mmH / ((GRID_ROWS * CELL_SIZE) + this.gridOffsetY);
+    const scaleY = mmH / (GRID_ROWS * CELL_SIZE);
     this.minimapDot.clear();
     const dotX = mmX + this.player.x * scaleX;
-    const dotY = mmY + this.player.y * scaleY;
+    const dotY = mmY + (this.player.y - this.gridOffsetY) * scaleY;
     this.minimapDot.fillStyle(0x00ffff, 0.8);
     this.minimapDot.fillCircle(dotX, dotY, 3);
     this.minimapDot.fillStyle(0x00ffff, 0.3);

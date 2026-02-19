@@ -500,6 +500,9 @@ export class VaultBuilderScene extends Phaser.Scene {
         this.vault.grid[row][col] = {
           cellType: row === GRID_ROWS - 1 ? CellType.PLATFORM : CellType.EMPTY,
           trapType: null,
+          hasCoin: false,
+          hasExit: false,
+          hasEntrance: false,
         };
       }
     }

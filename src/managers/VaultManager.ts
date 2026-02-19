@@ -167,9 +167,9 @@ export class VaultManager {
     grid2[7][2].trapType = TrapType.SPIKES;
     grid2[7][5].trapType = TrapType.SPIKES;
     grid2[7][7].trapType = TrapType.SPIKES;
-    grid2[6][4] = { cellType: CellType.PLATFORM, trapType: TrapType.LASER };
-    grid2[4][6] = { cellType: CellType.PLATFORM, trapType: TrapType.TURRET };
-    grid2[2][5] = { cellType: CellType.PLATFORM, trapType: TrapType.SAW_BLADE };
+    grid2[6][4] = { cellType: CellType.PLATFORM, trapType: TrapType.LASER, hasCoin: false, hasExit: false, hasEntrance: false };
+    grid2[4][6] = { cellType: CellType.PLATFORM, trapType: TrapType.TURRET, hasCoin: false, hasExit: false, hasEntrance: false };
+    grid2[2][5] = { cellType: CellType.PLATFORM, trapType: TrapType.SAW_BLADE, hasCoin: false, hasExit: false, hasEntrance: false };
 
     vaults.push({
       id: 'sample_gauntlet',
@@ -186,8 +186,8 @@ export class VaultManager {
     // Sample vault 3: Deception
     const grid3 = createEmptyGrid();
     for (let c = 0; c < 10; c++) grid3[5][c] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
-    grid3[5][3] = { cellType: CellType.PLATFORM, trapType: TrapType.FAKE_FLOOR };
-    grid3[5][6] = { cellType: CellType.PLATFORM, trapType: TrapType.FAKE_FLOOR };
+    grid3[5][3] = { cellType: CellType.PLATFORM, trapType: TrapType.FAKE_FLOOR, hasCoin: false, hasExit: false, hasEntrance: false };
+    grid3[5][6] = { cellType: CellType.PLATFORM, trapType: TrapType.FAKE_FLOOR, hasCoin: false, hasExit: false, hasEntrance: false };
     grid3[3][4] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
     grid3[3][5] = { cellType: CellType.PLATFORM, trapType: null, hasCoin: false, hasExit: false, hasEntrance: false };
     grid3[7][2].trapType = TrapType.SPIKES;

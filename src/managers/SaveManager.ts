@@ -130,7 +130,22 @@ export class SaveManager {
   loadVaults(): any[] {
     try {
       const saved = localStorage.getItem(VAULTS_KEY);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const vaults = JSON.parse(saved);
+        // Migrate old vaults — add missing fields
+        for (const vault of vaults) {
+          if (vault.grid) {
+            for (const row of vault.grid) {
+              for (const cell of row) {
+                if (cell.hasCoin === undefined) cell.hasCoin = false;
+                if (cell.hasExit === undefined) cell.hasExit = false;
+                if (cell.hasEntrance === undefined) cell.hasEntrance = false;
+              }
+            }
+          }
+        }
+        return vaults;
+      }
     } catch (e) {
       console.warn('Failed to load vaults:', e);
     }
