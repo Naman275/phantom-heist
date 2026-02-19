@@ -1,0 +1,28 @@
+# Logs
+logs
+*.log
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Android build
+android/
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Firebase
+.firebase/
+
+# Environment
+.env
+.env.local

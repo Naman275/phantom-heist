@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---- Player profiles ----
+    match /players/{playerId} {
+      // Players can read any profile (for leaderboards)
+      allow read: if true;
+      // Players can only write their own profile
+      allow write: if request.auth != null && request.auth.uid == playerId;
+    }
+
+    // ---- Vaults ----
+    match /vaults/{vaultId} {
+      // Anyone can read published vaults
+      allow read: if true;
+      // Only authenticated users can create/update their own vaults
+      allow create: if request.auth != null
+        && request.resource.data.creatorId == request.auth.uid;
+      allow update: if request.auth != null
+        && (resource.data.creatorId == request.auth.uid
+            // Allow anyone to increment attempt/success stats
+            || request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['stats', 'updatedAt']));
+      // Only vault owner can delete
+      allow delete: if request.auth != null
+        && resource.data.creatorId == request.auth.uid;
+    }
+
+    // ---- Replays ----
+    match /replays/{replayId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow delete: if request.auth != null
+        && resource.data.raiderId == request.auth.uid;
+    }
+
+    // ---- Leaderboard (read-only, written by Cloud Functions) ----
+    match /leaderboard/{entry} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}
